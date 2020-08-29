@@ -60,21 +60,28 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     async function loadFoods(): Promise<void> {
       // Load Foods from API
+      const response = await api.get('/foods');
+      const foodsFromAPI = response.data;
+      setFoods(foodsFromAPI);
     }
-
     loadFoods();
   }, [selectedCategory, searchValue]);
 
   useEffect(() => {
     async function loadCategories(): Promise<void> {
       // Load categories from API
+      const response = await api.get('categories');
+      const categoriesFromAPI = response.data;
+      setCategories(categoriesFromAPI);
     }
-
     loadCategories();
   }, []);
 
   function handleSelectCategory(id: number): void {
     // Select / deselect category
+    id === selectedCategory
+      ? setSelectedCategory(undefined)
+      : setSelectedCategory(id);
   }
 
   return (
