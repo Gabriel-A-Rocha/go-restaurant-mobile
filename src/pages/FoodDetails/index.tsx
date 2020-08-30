@@ -97,7 +97,20 @@ const FoodDetails: React.FC = () => {
 
       setExtras(extrasWithQuantity);
 
-      // console.log(extrasWithQuantity);
+      const favoritesResponse = await api.get<
+        Array<Omit<Food, 'formattedPrice'>>
+      >('favorites');
+      const favoritesFromAPI = favoritesResponse.data;
+
+      if (!favoritesFromAPI) {
+        setIsFavorite(false);
+      } else {
+        favoritesFromAPI.forEach(item => {
+          if (item.id === foodFromAPI.id) {
+            setIsFavorite(true);
+          }
+        });
+      }
     }
 
     loadFood();
@@ -143,22 +156,52 @@ const FoodDetails: React.FC = () => {
 
   function handleIncrementFood(): void {
     // Increment food quantity
+    setFoodQuantity(prev => prev + 1);
   }
 
   function handleDecrementFood(): void {
     // Decrement food quantity
+    setFoodQuantity(prev => (prev > 0 ? prev - 1 : prev));
   }
 
   const toggleFavorite = useCallback(() => {
     // Toggle if food is favorite or not
+
+    if (isFavorite) {
+      api.delete(`/favorites/${food.id}`).then(() => {
+        setIsFavorite(!isFavorite);
+      });
+    } else {
+      api.post('/favorites/', food).then(() => {
+        setIsFavorite(!isFavorite);
+      });
+    }
   }, [isFavorite, food]);
 
   const cartTotal = useMemo(() => {
     // Calculate cartTotal
+    const foodCost = food.price * foodQuantity;
+
+    let extrasCost = 0;
+
+    extras.forEach(extra => {
+      extrasCost += extra.value * extra.quantity;
+    });
+
+    return formatValue(foodCost + extrasCost);
   }, [extras, food, foodQuantity]);
 
   async function handleFinishOrder(): Promise<void> {
     // Finish the order and save on the API
+
+    const { id, ...rest } = food;
+
+    await api.post('orders', {
+      product_id: food.id,
+      ...rest,
+      price: cartTotal,
+      extras,
+    });
   }
 
   // Calculate the correct icon name
@@ -233,7 +276,7 @@ const FoodDetails: React.FC = () => {
         <TotalContainer>
           <Title>Total do pedido</Title>
           <PriceButtonContainer>
-            <TotalPrice testID="cart-total">{/* {cartTotal} */}12</TotalPrice>
+            <TotalPrice testID="cart-total">{cartTotal}</TotalPrice>
             <QuantityContainer>
               <Icon
                 size={15}

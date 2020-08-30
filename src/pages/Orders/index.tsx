@@ -38,19 +38,12 @@ const Orders: React.FC = () => {
       );
       const ordersFromAPI = response.data;
 
-      // console.log('Order from API (raw)', ordersFromAPI);
-
       const ordersWithFormattedValue = ordersFromAPI.map(item => {
         return {
           ...item,
           formattedValue: formatValue(item.price),
         };
       });
-
-      /* console.log(
-        'Orders formatted (with currency format)',
-        ordersWithFormattedValue,
-      ); */
 
       setOrders(ordersWithFormattedValue);
     }
