@@ -161,7 +161,7 @@ const FoodDetails: React.FC = () => {
 
   function handleDecrementFood(): void {
     // Decrement food quantity
-    setFoodQuantity(prev => (prev > 0 ? prev - 1 : prev));
+    setFoodQuantity(prev => (prev > 1 ? prev - 1 : prev));
   }
 
   const toggleFavorite = useCallback(() => {
@@ -194,14 +194,20 @@ const FoodDetails: React.FC = () => {
   async function handleFinishOrder(): Promise<void> {
     // Finish the order and save on the API
 
-    const { id, ...rest } = food;
+    const { id, formattedPrice, ...rest } = food;
 
-    await api.post('orders', {
+    const response = await api.post('orders', {
       product_id: food.id,
       ...rest,
       price: cartTotal,
       extras,
     });
+
+    const orderSubmitted = response.data;
+
+    // console.log('orderSubmitted', orderSubmitted);
+
+    navigation.navigate('MainBottom');
   }
 
   // Calculate the correct icon name

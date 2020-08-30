@@ -38,7 +38,7 @@ const Favorites: React.FC = () => {
       );
       const favoritesFromAPI = response.data;
 
-      // console.log('favoritesFromAPI', favoritesFromAPI);
+      console.log('favoritesFromAPI', favoritesFromAPI);
 
       const favoritesWithFormattedPrice = favoritesFromAPI.map(item => {
         return {
@@ -47,7 +47,8 @@ const Favorites: React.FC = () => {
         };
       });
 
-      // console.log('favoritesWithFormattedPrice', favoritesWithFormattedPrice);
+      console.log('favoritesWithFormattedPrice', favoritesWithFormattedPrice);
+
       setFavorites(favoritesWithFormattedPrice);
     }
 
