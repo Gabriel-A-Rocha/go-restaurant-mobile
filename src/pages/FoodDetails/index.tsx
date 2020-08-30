@@ -76,7 +76,9 @@ const FoodDetails: React.FC = () => {
       // Load a specific food with extras based on routeParams id
       const foodId = routeParams.id;
 
-      const response = await api.get(`/foods/${foodId}`);
+      const response = await api.get<Omit<Food, 'formattedPrice'>>(
+        `/foods/${foodId}`,
+      );
       const foodFromAPI = response.data;
 
       const foodWithFormattedPrice = {
@@ -84,9 +86,18 @@ const FoodDetails: React.FC = () => {
         formattedPrice: formatValue(foodFromAPI.price),
       };
 
-      console.log(foodWithFormattedPrice);
-
       setFood(foodWithFormattedPrice);
+
+      const extrasWithQuantity = foodFromAPI.extras.map(item => {
+        return {
+          ...item,
+          quantity: 0,
+        };
+      });
+
+      setExtras(extrasWithQuantity);
+
+      // console.log(extrasWithQuantity);
     }
 
     loadFood();
@@ -94,10 +105,40 @@ const FoodDetails: React.FC = () => {
 
   function handleIncrementExtra(id: number): void {
     // Increment extra quantity
+    const extraSelected = extras.find(item => id === item.id);
+
+    if (extraSelected) {
+      const updatedArray = extras.map(item => {
+        if (item.id === id) {
+          return {
+            ...item,
+            quantity: item.quantity + 1,
+          };
+        }
+        return item;
+      });
+
+      setExtras(updatedArray);
+    }
   }
 
   function handleDecrementExtra(id: number): void {
     // Decrement extra quantity
+    const extraSelected = extras.find(item => id === item.id);
+
+    if (extraSelected && extraSelected.quantity > 0) {
+      const updatedArray = extras.map(item => {
+        if (item.id === id) {
+          return {
+            ...item,
+            quantity: item.quantity - 1,
+          };
+        }
+        return item;
+      });
+
+      setExtras(updatedArray);
+    }
   }
 
   function handleIncrementFood(): void {
@@ -192,7 +233,7 @@ const FoodDetails: React.FC = () => {
         <TotalContainer>
           <Title>Total do pedido</Title>
           <PriceButtonContainer>
-            <TotalPrice testID="cart-total">{cartTotal}</TotalPrice>
+            <TotalPrice testID="cart-total">{/* {cartTotal} */}12</TotalPrice>
             <QuantityContainer>
               <Icon
                 size={15}
